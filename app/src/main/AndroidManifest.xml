@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.guesthousebooking">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".AddRoom"
+            android:parentActivityName=".ShowRoom" />
+        <activity
+            android:name=".ShowRoom"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".ViewRoom"
+            android:parentActivityName=".ShowRoom" />
+        <activity
+            android:name=".AdminCheckAvailability"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".ManageBookings"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".ShowUserBill"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".AdminShowBill"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".CheckInOut"
+            android:parentActivityName=".AdminHome" />
+        <activity android:name=".AdminViewUser" />
+        <activity android:name=".AdminHome" />
+        <activity
+            android:name=".AdminManageRegistration"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".AdminViewBooking"
+            android:parentActivityName=".ManageBookings" />
+        <activity android:name=".AdminLogin" />
+        <activity
+            android:name=".Home"
+            android:label="@string/title_activity_home"
+            android:parentActivityName=".Home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".HomeUser" />
+        <activity android:name=".Register" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/menu_home" />
+
+        <item
+            android:id="@+id/nav_check_availability"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Check Availability" />
+        <item
+            android:id="@+id/nav_make_booking"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Make Booking" />
+        <item
+            android:id="@+id/nav_view_booking"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="View Booking" />
+        <item
+            android:id="@+id/nav_cancel_booking"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Cancel Booking" />
+
+
+    </group>
+
+    <item android:title="Others">
+        <menu>
+            <item
+                android:id="@+id/nav_view_profile"
+                android:icon="@drawable/ic_menu_share"
+                android:title="View Profile" />
+
+        </menu>
+    </item>
+
+</menu>

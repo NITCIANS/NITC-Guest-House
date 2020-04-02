@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1036734309215",
+    "firebase_url": "https://guest-house-booking-12743.firebaseio.com",
+    "project_id": "guest-house-booking-12743",
+    "storage_bucket": "guest-house-booking-12743.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036734309215:android:c8af8db7875cebfbb80cea",
+        "android_client_info": {
+          "package_name": "com.example.guesthousebooking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1036734309215-6m4mjd2n4cu02oplvdg54eipmpl7vrj8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.guesthousebooking",
+            "certificate_hash": "9cab2cd7c6e9e266ddf8058b47c23254beb91928"
+          }
+        },
+        {
+          "client_id": "1036734309215-nllk20ua7ankurtbcsk32i484isdl0f9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjFo10VXDZQKvm4ftEshUl6OJobOATOxE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1036734309215-nllk20ua7ankurtbcsk32i484isdl0f9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

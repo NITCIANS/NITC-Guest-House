@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.guesthousebooking.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+
+
+    <fragment
+        android:id="@+id/nav_make_booking"
+        android:name="com.example.guesthousebooking.ui.makebooking.MakeBooking"
+        android:label="Make Booking"
+        tools:layout="@layout/make_booking_fragment" />
+    <fragment
+        android:id="@+id/nav_view_booking"
+        android:name="com.example.guesthousebooking.ui.viewbooking.ViewBooking"
+        android:label="View Booking"
+        tools:layout="@layout/view_booking_fragment" />
+    <fragment
+        android:id="@+id/nav_cancel_booking"
+        android:name="com.example.guesthousebooking.ui.cancelbooking.CancelBooking"
+        android:label="Cancel Booking"
+        tools:layout="@layout/make_booking_fragment" />
+    <fragment
+        android:id="@+id/nav_check_availability"
+        android:name="com.example.guesthousebooking.ui.checkavailability.CheckAvailability"
+        android:label="Check Availability"
+        tools:layout="@layout/check_availability_fragment" />
+    <fragment
+        android:id="@+id/nav_view_profile"
+        android:name="com.example.guesthousebooking.ui.viewprofile.ViewProfile"
+        android:label="View Profile"
+        tools:layout="@layout/view_profile_fragment" />
+
+</navigation>
