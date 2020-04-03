@@ -32,6 +32,8 @@ public class ViewRoom extends AppCompatActivity {
     private TextView roomId, price, AC, status;
     DatabaseReference ref;
     String[] details;
+    private Button changeStatus;
+    int check = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,7 @@ public class ViewRoom extends AppCompatActivity {
         price = findViewById(R.id.T4);
         AC = findViewById(R.id.T6);
         status = findViewById(R.id.T8);
+        changeStatus = findViewById(R.id.B1);
 
         details = getIntent().getStringArrayExtra("Details");
 
@@ -57,7 +60,8 @@ public class ViewRoom extends AppCompatActivity {
             status.setText("Occupied");
         else
             status.setText("Free");
-       /* ref = FirebaseDatabase.getInstance().getReference("Room");
+
+        ref = FirebaseDatabase.getInstance().getReference("Room");
         changeStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,20 +75,18 @@ public class ViewRoom extends AppCompatActivity {
                         ref.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                int check = 0;
 
-                                for(DataSnapshot keys : dataSnapshot.getChildren()) {
-                                    if(keys.getKey().equals(details[0])) {
-                                        Room R = dataSnapshot.child(keys.getKey()).getValue(Room.class);
-                                        if(check == 0) {
-                                            R.changeRoomStatus();
-                                            ref.child(details[0]).setValue(R);
-                                            check = 1;
-                                            Intent intent = new Intent(ViewRoom.this, ShowRoom.class);
-                                            startActivity(intent);
-                                        }
+                                    if (dataSnapshot.hasChild(details[0]) && check == 0)
+                                    {
+                                        Room R = dataSnapshot.child(details[0]).getValue(Room.class);
+                                        R.changeRoomStatus();
+                                        ref.child(details[0]).setValue(R);
+                                        Toast.makeText(ViewRoom.this, "Status Changed Successfully.." , Toast.LENGTH_LONG).show();
+                                        finish();
+                                        Intent intent = new Intent(ViewRoom.this, ShowRoom.class);
+                                        startActivity(intent);
+                                        check = 1;
                                     }
-                                }
 
                             }
 
@@ -110,7 +112,7 @@ public class ViewRoom extends AppCompatActivity {
                 builder.show();
 
             }
-        });*/
+        });
 
 
     }

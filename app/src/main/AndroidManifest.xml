@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AdminShowBooking"
+            android:parentActivityName=".AdminHome" />
+        <activity
+            android:name=".ShowUserBooking"
+            android:parentActivityName=".AdminHome" />
         <activity
             android:name=".AddRoom"
             android:parentActivityName=".ShowRoom" />

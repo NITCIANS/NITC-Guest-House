@@ -9,18 +9,20 @@
 
     <TableLayout
         android:id="@+id/TL1"
-        android:layout_width="0dp"
-        android:layout_height="338dp"
+        android:layout_width="383dp"
+        android:layout_height="363dp"
         android:layout_marginStart="11dp"
         android:layout_marginLeft="11dp"
         android:layout_marginTop="112dp"
         android:layout_marginEnd="11dp"
         android:layout_marginRight="11dp"
+        android:layout_marginBottom="280dp"
         android:padding="15dp"
         android:stretchColumns="1"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <TableRow>
 
@@ -29,9 +31,7 @@
                 android:layout_height="match_parent"
                 android:text="Booking Id :" />
 
-            <TextView
-                android:id="@+id/T9"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T9" />
         </TableRow>
 
         <TableRow>
@@ -57,8 +57,7 @@
 
             <TextView
                 android:id="@+id/T10"
-                android:layout_height="match_parent"
-                android:text="Booking Id :" />
+                android:layout_height="match_parent" />
         </TableRow>
 
         <TableRow>
@@ -82,9 +81,7 @@
                 android:layout_height="match_parent"
                 android:text="Booking Date :" />
 
-            <TextView
-                android:id="@+id/T11"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T11" />
         </TableRow>
 
         <TableRow>
@@ -108,9 +105,7 @@
                 android:layout_height="match_parent"
                 android:text="Check In Date :" />
 
-            <TextView
-                android:id="@+id/T12"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T12" />
         </TableRow>
 
         <TableRow>
@@ -134,9 +129,7 @@
                 android:layout_height="match_parent"
                 android:text="Check Out Date :" />
 
-            <TextView
-                android:id="@+id/T13"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T13" />
         </TableRow>
 
         <TableRow>
@@ -160,9 +153,7 @@
                 android:layout_height="match_parent"
                 android:text="No. Of Room :" />
 
-            <TextView
-                android:id="@+id/T14"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T14" />
         </TableRow>
 
         <TableRow>
@@ -187,9 +178,7 @@
                 android:layout_height="match_parent"
                 android:text="Food Services :" />
 
-            <TextView
-                android:id="@+id/T15"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T15" />
         </TableRow>
 
         <TableRow>
@@ -213,9 +202,8 @@
                 android:layout_height="match_parent"
                 android:text="BookingStatus :" />
 
-            <TextView
-                android:id="@+id/T16"
-                android:text="Booking Id :" />
+            <TextView android:id="@+id/T16" />
+
         </TableRow>
     </TableLayout>
 
@@ -223,22 +211,40 @@
         android:id="@+id/B1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="58dp"
-        android:layout_marginLeft="58dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginEnd="22dp"
+        android:layout_marginRight="22dp"
+        android:layout_marginBottom="122dp"
         android:text="Confirm"
-        app:layout_constraintBottom_toBottomOf="@+id/B1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/B2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/B1" />
+        app:layout_constraintTop_toBottomOf="@+id/TL1"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/B1"
+        android:id="@+id/B2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="63dp"
-        android:layout_marginRight="63dp"
-        android:layout_marginBottom="109dp"
+        android:layout_marginEnd="68dp"
+        android:layout_marginRight="68dp"
+        android:layout_marginBottom="120dp"
         android:text="Reject"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/B1" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Booking Details"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

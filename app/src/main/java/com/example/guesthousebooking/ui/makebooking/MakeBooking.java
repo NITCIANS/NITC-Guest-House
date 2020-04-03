@@ -343,6 +343,11 @@ public class MakeBooking extends Fragment {
             return false;
         }
 
+        if(Math.abs(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1])) != 1 || Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1]) != 11)
+        {
+            Toast.makeText(getActivity(), "You can make bookings only 1 Month or less before your Check In Date..", Toast.LENGTH_LONG).show();
+            return  false;
+        }
 
 
 

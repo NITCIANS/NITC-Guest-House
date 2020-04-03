@@ -2,46 +2,29 @@ package com.example.guesthousebooking;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.graphics.pdf.PdfDocument;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.FileHandler;
 
-public class AdminShowBill extends AppCompatActivity {
-
-
-
+public class AdminShowBooking extends AppCompatActivity {
 
     DatePickerDialog datePickerDialog1;
     DatePickerDialog datePickerDialog2;
@@ -55,20 +38,20 @@ public class AdminShowBill extends AppCompatActivity {
     Calendar calendar;
 
     Booking booking;
-    Bill bill;
     String bookingId;
 
     String[] arr1, arr2;
 
     private DatabaseReference ref;
-    private List<Bill> list = new ArrayList<>();
-    ArrayAdapter<Bill> adapter;
+    private List<Booking> list = new ArrayList<>();
+    ArrayAdapter<Booking> adapter;
     private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_show_bill);
+        setContentView(R.layout.activity_admin_show_booking);
+
         Download = findViewById(R.id.B3);
         Show = findViewById(R.id.B4);
         Click1 = findViewById(R.id.B1);
@@ -80,7 +63,6 @@ public class AdminShowBill extends AppCompatActivity {
         To.setEnabled(false);
         Download.setVisibility(View.GONE);
 
-
         Click1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -91,7 +73,7 @@ public class AdminShowBill extends AppCompatActivity {
                 day1 = calendar.get(Calendar.DAY_OF_MONTH);
 
 
-                datePickerDialog1 = new DatePickerDialog(AdminShowBill.this,
+                datePickerDialog1 = new DatePickerDialog(AdminShowBooking.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
@@ -113,7 +95,7 @@ public class AdminShowBill extends AppCompatActivity {
                 day2 = calendar.get(Calendar.DAY_OF_MONTH);
 
 
-                datePickerDialog2 = new DatePickerDialog(AdminShowBill.this,
+                datePickerDialog2 = new DatePickerDialog(AdminShowBooking.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
@@ -131,47 +113,6 @@ public class AdminShowBill extends AppCompatActivity {
 
         });
 
-        Download.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onClick(View v) {
-
-                PdfDocument myPdfDocument = new PdfDocument();
-                PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(300,600,1).create();
-                PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
-
-                Paint myPaint = new Paint();
-                String myString = "My Name is Yogesh Kumar Adhikari";
-                int x = 10, y=25;
-
-                for (String line: myString.split("\n"))
-                {
-                    myPage.getCanvas().drawText(line, x, y, myPaint);
-                    y += myPaint.descent()-myPaint.ascent();
-                }
-                myPdfDocument.finishPage(myPage);
-
-
-
-
-                try
-                {
-                    //ActivityCompat.requestPermissions(AdminShowBill.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                   //ActivityCompat.requestPermissions(AdminShowBill.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-                    //myPdfDocument.writeTo(new FileOutputStream(filePath));
-                }
-                catch (Exception e){
-
-                    Toast.makeText(AdminShowBill.this, "Error name " + e, Toast.LENGTH_LONG).show();
-
-                }
-
-                myPdfDocument.close();
-
-
-
-            }
-        });
 
         Show.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,19 +127,19 @@ public class AdminShowBill extends AppCompatActivity {
 
                     listView = findViewById(R.id.LV);
 
-                    adapter = new ArrayAdapter<Bill>(AdminShowBill.this, android.R.layout.simple_list_item_1, list);
+                    adapter = new ArrayAdapter<Booking>(AdminShowBooking.this, android.R.layout.simple_list_item_1, list);
 
                     listView.setAdapter(adapter);
 
-                    ref = FirebaseDatabase.getInstance().getReference("Bill");
+                    ref = FirebaseDatabase.getInstance().getReference("Booking");
 
                     ref.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                            bill = dataSnapshot.getValue(Bill.class);
-                            String[] arr = bill.getCheckInDate().split("-");
+                            booking = dataSnapshot.getValue(Booking.class);
+                            String[] arr = booking.getCheckInDate().split("-");
                             if (Integer.parseInt(arr[0]) >= Integer.parseInt(arr1[0])) {
-                                list.add(bill);
+                                list.add(booking);
                                 adapter.notifyDataSetChanged();
                                 Download.setVisibility(View.VISIBLE);
 
@@ -230,8 +171,6 @@ public class AdminShowBill extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     boolean isEmpty(EditText text)
