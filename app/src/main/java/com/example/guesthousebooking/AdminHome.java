@@ -44,6 +44,7 @@ public class AdminHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_home);
         showUserBill = findViewById(R.id.button9);
+        getIntent();
 
 
         showUserBill.setOnClickListener(new View.OnClickListener(){
@@ -140,8 +141,8 @@ public class AdminHome extends AppCompatActivity {
     }
     public void showAllBill(View view)
     {
-        Intent intent = new Intent(this,AdminShowBill.class);
-        startActivity(intent);
+      //  Intent intent = new Intent(this,AdminShowBill.class);
+       // startActivity(intent);
     }
     public void manageBooking(View view)
     {
