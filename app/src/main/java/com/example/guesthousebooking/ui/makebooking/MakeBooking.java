@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -26,6 +27,7 @@ import com.example.guesthousebooking.Booking;
 import com.example.guesthousebooking.GuestHouse;
 import com.example.guesthousebooking.Home;
 import com.example.guesthousebooking.R;
+import com.example.guesthousebooking.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,9 +45,10 @@ public class MakeBooking extends Fragment {
 
     private MakeBookingViewModel mViewModel;
 
-    Button CIB, COB, Book;
-    EditText CI, CO;
-    Spinner number;
+    private Button CIB, COB, Book;
+    private EditText CID, COD;
+    private Spinner number;
+    private CheckBox Food;
 
     DatePickerDialog datePickerDialog1;
     DatePickerDialog datePickerDialog2;
@@ -57,12 +61,12 @@ public class MakeBooking extends Fragment {
     Booking booking;
     int count = 0;
     int i, rooms;
-    String[] arr1, arr2;
+    String userType;
     String child;
     int check = 0;
 
 
-    private DatabaseReference ref, reff;
+    private DatabaseReference ref, reff, reference;
 
 
     public static MakeBooking newInstance() {
@@ -77,19 +81,48 @@ public class MakeBooking extends Fragment {
         View V = inflater.inflate(R.layout.make_booking_fragment, container, false);
 
 
-        Book= V.findViewById(R.id.B1);
-        CIB = V.findViewById(R.id.B1);
-        COB= V.findViewById(R.id.B1);
-        CI = V.findViewById(R.id.ET1);
-        CO = V.findViewById(R.id.ET2);
+
+       /* CIB = V.findViewById(R.id.B2);
+        COB= V.findViewById(R.id.B2);
+        Book= V.findViewById(R.id.B3);
+
+
+        CID = V.findViewById(R.id.ET1);
+        COD = V.findViewById(R.id.ET2);
+        CID.setEnabled(false);
+        COD.setEnabled(false);
+
         number = V.findViewById(R.id.S1);
+        Food = V.findViewById(R.id.CB);
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
         final String personEmail = acct.getEmail();
 
+
+
         booking = new Booking();
         ref = FirebaseDatabase.getInstance().getReference("Booking");
         reff = FirebaseDatabase.getInstance().getReference("GuestHouse");
+        reference = FirebaseDatabase.getInstance().getReference("User");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                if(dataSnapshot.hasChild(personEmail.split("@")[0]))
+                {
+                    User U = dataSnapshot.child(personEmail.split("@")[0]).getValue(User.class);
+                    userType = U.getType();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
@@ -121,67 +154,136 @@ public class MakeBooking extends Fragment {
                             Date date = new Date();
                             SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
                             String today = formatter.format(date);
-                            String CIDate = CI.getText().toString().trim();
-                            String CODate = CO.getText().toString().trim();
-
-                            arr1 = CIDate.split("-");
-                            arr2 = CODate.split("-");
-
-                            CIDate = CIDate + " 10:00:00";
-                            CODate = CODate + " 10:00:00";
-
+                            final String CIDate = CID.getText().toString().trim();
+                            final String CODate = COD.getText().toString().trim();
 
                             booking.setCheckInDate(CIDate);
                             booking.setCheckOutDate(CODate);
                             booking.setUserId(personEmail);
+                            booking.setType(userType);
 
                             booking.setBookingDate(today);
-                            booking.setFoodServices(false);
+                            if(Food.isSelected())
+                                booking.setFoodServices(true);
+                            else
+                                booking.setFoodServices(false);
+
                             booking.setBookingStatus("Pending");
                             booking.setBookingId(count + 1);
-
-
-                            day1 = Integer.parseInt(arr1[0]);
-                            day2 = Integer.parseInt(arr2[0]);
-
                             rooms = Integer.parseInt(number.getSelectedItem().toString().trim());
 
-                            i = day1;
-                            month1 = Integer.parseInt(arr1[1]);
-                            month2 = Integer.parseInt(arr1[1]);
-                            year1 = Integer.parseInt(arr1[2]);
-                            year2 = Integer.parseInt(arr2[2]);
 
                             reff.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                                     check = 0;
-                                    for(DataSnapshot keys : dataSnapshot.getChildren()) {
+                                    for (DataSnapshot keys : dataSnapshot.getChildren()) {
 
-
-                                        child = Integer.toString(i) + "-" + arr1[1] + "-" + arr1[2];
-                                        if(keys.getKey().equals(child)) {
+                                        String child = keys.getKey();
+                                        if (checkDate(child, CIDate, CODate)) {
                                             GuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
-                                            if(G1.checkAvailability() < rooms) {
-                                                Toast.makeText(getActivity(), "Rooms Available on : " + child + "is " + G1.checkAvailability(), Toast.LENGTH_LONG).show();
+                                            if (G1.checkAvailability() < rooms)
                                                 check = 1;
-                                            }
-                                            if(i == day2 - 1)
-                                                break;
-                                            i = i + 1;
                                         }
-                                    }
 
+                                    }
                                     if(check == 0) {
-                                        Toast.makeText(getActivity(), "You made a Booking.", Toast.LENGTH_LONG).show();
-                                        ref.child(Integer.toString(count + 1)).setValue(booking);
-                                        Intent intent = new Intent(getActivity(), Home.class);
-                                        startActivity(intent);
+
+                                        if(userType.equals("Director") || userType.equals("Registrar"))
+                                        {
+                                            booking.setBookingStatus("Confirmed");
+                                            booking.sendMail(getActivity(), 1);
+                                            Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details.." , Toast.LENGTH_LONG).show();
+                                            ref.child(Integer.toString(count + 1)).setValue(booking);
+                                            Intent intent = new Intent(getActivity(), Home.class);
+                                            startActivity(intent);
+                                        }
+                                        else if(userType.equals("Faculty") || userType.equals("Staff") || userType.equals("SAC Member"))
+                                        {
+                                            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                            Date currentDate = new Date();
+                                            Calendar c = Calendar.getInstance();
+                                            c.setTime(currentDate);
+                                            c.add(Calendar.DAY_OF_MONTH, 3);
+                                            Date currentDatePlusThree = c.getTime();
+
+                                            try {
+                                                Date date1 = (Date)formatter.parse(CIDate);
+                                                String dates = formatter.format(currentDatePlusThree);
+                                                Date newDate = (Date)formatter.parse(dates);
+
+                                                if(newDate.after(date1))
+                                                {
+                                                    booking.setBookingStatus("Confirmed");
+                                                    booking.sendMail(getActivity(), 1);
+                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
+                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                    Intent intent = new Intent(getActivity(), Home.class);
+                                                    startActivity(intent);
+                                                }
+                                                else
+                                                {
+                                                    booking.setBookingStatus("Pending");
+                                                    booking.sendMail(getActivity(), 3);
+                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
+                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                    Intent intent = new Intent(getActivity(), Home.class);
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                            catch (ParseException e) {
+                                                Toast.makeText(getActivity(), "Error : " + e, Toast.LENGTH_LONG).show();
+
+
+                                            }
+
+
+                                        }
+                                        else
+                                        {
+
+                                            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                            Date currentDate = new Date();
+                                            Calendar c = Calendar.getInstance();
+                                            c.setTime(currentDate);
+                                            c.add(Calendar.DAY_OF_MONTH, 1);
+                                            Date currentDatePlusOne = c.getTime();
+
+                                            try {
+                                                Date date1 = (Date)formatter.parse(CIDate);
+                                                String dates = formatter.format(currentDatePlusOne);
+                                                Date newDate = (Date)formatter.parse(dates);
+
+                                                if(newDate.after(date1))
+                                                {
+                                                    booking.setBookingStatus("Confirmed");
+                                                    booking.sendMail(getActivity(), 1);
+                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
+                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                    Intent intent = new Intent(getActivity(), Home.class);
+                                                    startActivity(intent);
+                                                }
+                                                else
+                                                {
+                                                    booking.setBookingStatus("Pending");
+                                                    booking.sendMail(getActivity(), 3);
+                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
+                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                    Intent intent = new Intent(getActivity(), Home.class);
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                            catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+
                                     }
                                     else
                                     {
-                                        Toast.makeText(getActivity(), "Rooms not available, Please check availability for all days and try again..", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getActivity(), "Rooms not available, Please check availability for your query first..", Toast.LENGTH_LONG).show();
                                     }
 
                                 }
@@ -228,7 +330,7 @@ public class MakeBooking extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
                             {
-                                CI.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
+                                CID.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
                             }
                         }, year1,month1,day1);
                 datePickerDialog1.show();
@@ -250,7 +352,7 @@ public class MakeBooking extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
                             {
-                                CO.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
+                                COD.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
 
 
                             }
@@ -261,14 +363,10 @@ public class MakeBooking extends Fragment {
 
             }
 
-        });
-
-
-
+        });*/
         return V;
 
     }
-
 
     boolean isEmpty(EditText text)
     {
@@ -276,104 +374,78 @@ public class MakeBooking extends Fragment {
         return TextUtils.isEmpty(str);
     }
 
-    boolean checkDataEntered()
-    {
+    boolean checkDataEntered() {
 
-        if (isEmpty(CI)){
-            CI.setError("Check In Date is required");
+
+        String d1 = CID.getText().toString().trim();
+        String d2 = COD.getText().toString().trim();
+        Date date1 = new Date(), date2 = new Date();
+
+        Date today = new Date();
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            date1 = (Date)formatter.parse(d1);
+            date2 = (Date)formatter.parse(d2);
+            today = formatter.parse(today.toString());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (isEmpty(CID)) {
+            CID.setError("Check In Date is required");
             return false;
         }
+        else {
 
-        if (isEmpty(CO)) {
-            CO.setError("Check Out Date is required");
-            return false;
-        }
-
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
-        String today = formatter.format(date);
-        String CID = CI.getText().toString().trim();
-        String COD = CO.getText().toString().trim();
-
-        String[] arr1 = (today.split("-"));
-        String[] arr2 = (CID.split("-"));
-        String[] arr3 = (COD.split("-"));
-
-        if(Integer.parseInt(arr1[2]) > Integer.parseInt(arr2[2]) )
-        {
-            CI.setError("Invalid Check In Date");
-            CI.setText("");
-            return false;
-        }
-        if(Integer.parseInt(arr1[1]) > Integer.parseInt(arr2[1]) )
-        {
-            CI.setError("Invalid Check In Date");
-            CI.setText("");
-            return false;
-        }
-
-        if(Integer.parseInt(arr1[0]) > Integer.parseInt(arr2[0])  && Integer.parseInt(arr1[1]) <= Integer.parseInt(arr2[1]))
-        {
-            CI.setError("Invalid Check In Date");
-            CI.setText("");
-            return false;
-        }
-
-
-
-        if(Integer.parseInt(arr2[2]) > Integer.parseInt(arr3[2]) )
-        {
-            CO.setError("Invalid Check Out Date");
-            CO.setText("");
-            return false;
-        }
-        if(Integer.parseInt(arr2[1]) > Integer.parseInt(arr3[1]) )
-        {
-            CO.setError("Invalid Check Out Date");
-            CO.setText("");
-            return false;
-        }
-
-
-        if(Integer.parseInt(arr2[0]) > Integer.parseInt(arr3[0])  && Integer.parseInt(arr2[1]) <= Integer.parseInt(arr3[1]))
-        {
-            CO.setError("Invalid Check Out Date");
-            CO.setText("");
-            return false;
-        }
-
-        if(Math.abs(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1])) != 1 || Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1]) == 11)
-        {
-            Toast.makeText(getActivity(), "You can make bookings only 1 Month or less before your Check In Date..", Toast.LENGTH_LONG).show();
-            return  false;
-        }
-
-
-
-
-
-
-
-        /*SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-        String checkInDate = CI.getText().toString().trim();
-        String checkOutDate = CO.getText().toString().trim();
-        try
-        {
-            if(sdf.parse(checkInDate).before(sdf.parse(checkOutDate))) {
-                CO.setError("Invalid Check Out Date");
-                CO.setText("");
+            CID.setError(null);
+            if(date1.before(today) && date1.after(today) != false)
+            {
+                CID.setError("Check In Date should be at least today's date");
+                CID.setText("");
                 return false;
             }
         }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }*/
 
+        if (isEmpty(COD)) {
+            COD.setError("Check Out Date is required");
+            return false;
+        }
+        else
+            COD.setError(null);
+        if(date2.after(date1) == false )
+        {
+            COD.setError("Check Out Date should be after Check In Date");
+            COD.setText("");
+            return false;
+        }
 
         return true;
+    }
+
+    boolean checkDate(String d1, String d2, String d3)
+    {
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            Date date1 = (Date)formatter.parse(d1);
+            Date date2 = (Date)formatter.parse(d2);
+            Date date3 = (Date)formatter.parse(d3);
+
+            if((date1.after(date2) && date1.before(date3)) || date1.equals(date2))
+                return true;
+            else
+                return false;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
 
     }
+
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

@@ -17,6 +17,15 @@ public class Booking
     private boolean foodServices;
     private String bookingStatus;
     private String userId;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getUserId() {
         return userId;
@@ -105,7 +114,10 @@ public class Booking
         if(type == 1)
             message = "Your Booking is Confirmed";
         else if(type == 2)
+            message = "You have made a Booking";
+        else if(type == 3)
             message = "Your Booking has been Rejected due to certain Conditions";
+
         message = message + "\n" + details;
         JavaMailAPI javaMailAPI = new JavaMailAPI(page, mail, subject, message);
         javaMailAPI.execute();

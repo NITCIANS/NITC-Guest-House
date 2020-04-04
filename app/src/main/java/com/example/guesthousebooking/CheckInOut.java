@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -40,7 +39,7 @@ public class CheckInOut extends AppCompatActivity {
         setContentView(R.layout.activity_check_in_out);
 
         ET1 = findViewById(R.id.ET1);
-        B1 = findViewById(R.id.B1);
+        B1 = findViewById(R.id.B2);
         B2 = findViewById(R.id.B2);
 
 

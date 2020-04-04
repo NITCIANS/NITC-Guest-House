@@ -45,7 +45,7 @@ public class CancelBooking extends Fragment {
         View V = inflater.inflate(R.layout.cancel_booking_fragment, container, false);
 
 
-        Cancel = V.findViewById(R.id.B1);
+        Cancel = V.findViewById(R.id.B2);
         BID = V.findViewById(R.id.ET1);
 
 

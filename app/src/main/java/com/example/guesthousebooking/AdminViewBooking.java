@@ -57,8 +57,8 @@ public class AdminViewBooking extends AppCompatActivity {
         T14 = findViewById(R.id.T14);
         T15 = findViewById(R.id.T15);
         T16 = findViewById(R.id.T16);
-        B1 = findViewById(R.id.B1);
-        B2 = findViewById(R.id.B1);
+        B1 = findViewById(R.id.B2);
+        B2 = findViewById(R.id.B2);
 
 
         final String[] BookingDetails;

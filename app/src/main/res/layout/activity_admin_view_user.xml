@@ -7,7 +7,7 @@
     tools:context=".AdminViewUser">
 
     <Button
-        android:id="@+id/B1"
+        android:id="@+id/B2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -18,7 +18,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/B1"
+        android:id="@+id/B2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="72dp"
@@ -114,7 +114,7 @@
         android:layout_marginLeft="68dp"
         android:layout_marginTop="298dp"
         android:layout_marginBottom="298dp"
-        app:layout_constraintBottom_toBottomOf="@+id/B1"
+        app:layout_constraintBottom_toBottomOf="@+id/B2"
         app:layout_constraintStart_toEndOf="@+id/TV7"
         app:layout_constraintTop_toTopOf="@+id/TV1" />
 

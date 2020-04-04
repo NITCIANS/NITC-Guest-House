@@ -32,8 +32,8 @@ public class AdminViewUser extends AppCompatActivity {
         TV6 = findViewById(R.id.TV6);
         TV8 = findViewById(R.id.TV8);
         TV10 = findViewById(R.id.TV10);
-        B1 = findViewById(R.id.B1);
-        B2 = findViewById(R.id.B1);
+        B1 = findViewById(R.id.B2);
+        B2 = findViewById(R.id.B2);
 
         String[] UserDetails;
         UserDetails = getIntent().getStringArrayExtra("User");

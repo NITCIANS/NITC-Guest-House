@@ -38,7 +38,7 @@ public class ManageBookings extends AppCompatActivity {
         setContentView(R.layout.activity_manage_bookings);
 
 
-        B1 = findViewById(R.id.B1);
+        B1 = findViewById(R.id.B2);
         S1 = findViewById(R.id.S1);
 
         B1.setOnClickListener(new View.OnClickListener() {

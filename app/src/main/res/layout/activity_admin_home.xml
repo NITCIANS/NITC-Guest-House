@@ -9,7 +9,7 @@
 
 
     <Button
-        android:id="@+id/B1"
+        android:id="@+id/B2"
         android:layout_width="180dp"
         android:layout_height="65dp"
         android:layout_marginStart="29dp"
@@ -33,7 +33,7 @@
         android:onClick="showAllBill"
         android:text="Show all bills"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/B1"
+        app:layout_constraintStart_toEndOf="@+id/B2"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -46,7 +46,7 @@
         android:onClick="manageBooking"
         android:text="Manage bookings"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/B1" />
+        app:layout_constraintTop_toBottomOf="@+id/B2" />
 
     <Button
         android:id="@+id/B4"

@@ -41,7 +41,7 @@ public class ShowRoom extends AppCompatActivity {
         setContentView(R.layout.activity_show_room);
 
 
-        addRoom = findViewById(R.id.B1);
+        addRoom = findViewById(R.id.B2);
         totalRooms = findViewById(R.id.T3);
         occupiedRooms = findViewById(R.id.T4);
         allRooms = findViewById(R.id.LV1);

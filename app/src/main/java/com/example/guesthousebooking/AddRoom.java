@@ -1,7 +1,6 @@
 package com.example.guesthousebooking;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,11 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,7 +43,7 @@ public class AddRoom extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_room);
 
-        addRoom = findViewById(R.id.B1);
+        addRoom = findViewById(R.id.B2);
         roomNo = findViewById(R.id.ET1);
         price = findViewById(R.id.ET2);
         AC = findViewById(R.id.CB);

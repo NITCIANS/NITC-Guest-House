@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,14 +36,24 @@ import java.util.Date;
 public class CheckAvailability extends Fragment {
 
     private CheckAvailabilityViewModel mViewModel;
+
+
+
     DatePickerDialog datePickerDialog1;
-    Button Check, Click;
-    EditText AD;
-    int year = 0;
-    int month;
-    int day;
+    DatePickerDialog datePickerDialog2;
+
+    Button Check, Click1, Click2;
+    EditText CID, COD;
+
+
+    int year1, year2;
+    int month1, month2;
+    int day1, day2;
     Calendar calendar;
-    int vacant = 10;
+
+    int totalRooms;
+    int count = 0;
+    String child, text1, text2;
 
 
     public static CheckAvailability newInstance() {
@@ -54,113 +66,92 @@ public class CheckAvailability extends Fragment {
         View V = inflater.inflate(R.layout.check_availability_fragment, container, false);
 
 
-        Click = V.findViewById(R.id.B1);
-        Check = V.findViewById(R.id.B1);
-        AD = V.findViewById(R.id.ET1);
-        AD.setEnabled(false);
+        Check = V.findViewById(R.id.B3);
+        Click1 = V.findViewById(R.id.B2);
+        Click2 = V.findViewById(R.id.B2);
+        CID = V.findViewById(R.id.ET1);
+        COD = V.findViewById(R.id.ET2);
+
+        CID.setEnabled(false);
+        COD.setEnabled(false);
+
+        DatabaseReference reff = FirebaseDatabase.getInstance().getReference("Room");
+        reff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                count = (int) dataSnapshot.getChildrenCount();
+                totalRooms = count;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         Check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-
-
-
-                final String text = AD.getText().toString().trim();
+                text1 = CID.getText().toString().trim();
+                text2 = COD.getText().toString().trim();
 
                 Date date = new Date();
                 SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
                 String today = formatter.format(date);
 
-                if(checkDate(today, text)) {
+                if(checkDataEntered()){
 
-
-                    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-                    DatabaseReference ref = rootRef.child("GuestHouse");
-                    ValueEventListener valueEventListener = new ValueEventListener() {
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("GuestHouse");
+                    ref.addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                             for (DataSnapshot keys : dataSnapshot.getChildren()) {
-                                if (keys.getKey().equals(text)) {
-                                    AbstractGuestHouse G1 = dataSnapshot.child(text).getValue(GuestHouse.class);
-                                    vacant = G1.checkAvailability();
-                                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                    builder.setTitle("Total No. Of Vacant Rooms:");
 
-                                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-
-
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                            dialog.cancel();
-
-                                        }
-
-                                    });
-                                    builder.setMessage(Integer.toString(vacant));
-                                    builder.show();
-                                } else {
-                                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                    builder.setTitle("Total No. Of Vacant Rooms:");
-
-                                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-
-
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                            dialog.cancel();
-
-                                        }
-
-                                    });
-                                    builder.setMessage(Integer.toString(vacant));
-                                    builder.show();
-
+                                String child = keys.getKey();
+                                if (checkDate(child, text1, text2)) {
+                                    AbstractGuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
+                                    if (G1.checkAvailability() < totalRooms)
+                                        totalRooms = G1.checkAvailability();
                                 }
+
                             }
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Total No. Of Vacant Rooms : ");
+                            builder.setMessage(Integer.toString(totalRooms));
+                            totalRooms = count;
+                            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
+
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            //Don't ignore errors!
-                        }
-                    };
-                    ref.addListenerForSingleValueEvent(valueEventListener);
-                }
-                else
-                {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("Please Select the upcoming dates");
-
-                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            dialog.cancel();
 
                         }
-
                     });
-                    builder.show();
 
                 }
-
             }
         });
 
-        Click.setOnClickListener(new View.OnClickListener() {
+
+        Click1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 calendar = Calendar.getInstance();
-                year = calendar.get(Calendar.YEAR);
-                month = calendar.get(Calendar.MONTH);
-                day = calendar.get(Calendar.DAY_OF_MONTH);
+                year1 = calendar.get(Calendar.YEAR);
+                month1 = calendar.get(Calendar.MONTH);
+                day1 = calendar.get(Calendar.DAY_OF_MONTH);
 
 
                 datePickerDialog1 = new DatePickerDialog(getActivity(),
@@ -168,19 +159,40 @@ public class CheckAvailability extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
                             {
-                                AD.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
+                                CID.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
                             }
-                        }, year,month,day);
+                        }, year1,month1,day1);
                 datePickerDialog1.show();
             }
         });
 
+        Click2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                calendar = Calendar.getInstance();
+                year2 = calendar.get(Calendar.YEAR);
+                month2 = calendar.get(Calendar.MONTH);
+                day2 = calendar.get(Calendar.DAY_OF_MONTH);
 
 
+                datePickerDialog2 = new DatePickerDialog(getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth)
+                            {
+                                COD.setText(dayOfMonth+ "-" + (month + 1) + "-" + year);
 
 
+                            }
+                        }, year2,month2,day2);
+
+                datePickerDialog2.show();
 
 
+            }
+
+        });
         return V;
     }
 
@@ -191,19 +203,80 @@ public class CheckAvailability extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    boolean checkDate(String date1, String date2)
+    boolean isEmpty(EditText text)
     {
-        String[] arr1 = (date1.split("-"));
-        String[] arr2 = (date2.split("-"));
-        if(Integer.parseInt(arr1[2]) > Integer.parseInt(arr2[2]) )
-            return false;
-        if(Integer.parseInt(arr1[1]) > Integer.parseInt(arr2[1]) )
-            return false;
+        CharSequence str = text.getText().toString();
+        return TextUtils.isEmpty(str);
+    }
 
-        if(Integer.parseInt(arr1[0]) > Integer.parseInt(arr2[0])  && Integer.parseInt(arr1[1]) <= Integer.parseInt(arr2[1]))
+    boolean checkDataEntered() {
+
+
+        String d1 = CID.getText().toString().trim();
+        String d2 = COD.getText().toString().trim();
+        Date date1 = new Date(), date2 = new Date();
+
+        Date today = new Date();
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            date1 = (Date)formatter.parse(d1);
+            date2 = (Date)formatter.parse(d2);
+            today = formatter.parse(today.toString());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (isEmpty(CID)) {
+            CID.setError("Check In Date is required");
             return false;
+        }
+        else {
+
+            CID.setError(null);
+            if(date1.before(today) && date1.after(today) != false)
+            {
+                CID.setError("Check In Date should be at least today's date");
+                CID.setText("");
+                return false;
+            }
+        }
+
+        if (isEmpty(COD)) {
+            COD.setError("Check Out Date is required");
+            return false;
+        }
+        else
+            COD.setError(null);
+        if(date2.after(date1) == false )
+        {
+            COD.setError("Check Out Date should be after Check In Date");
+            COD.setText("");
+            return false;
+        }
+
         return true;
+    }
 
+    boolean checkDate(String d1, String d2, String d3)
+    {
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            Date date1 = (Date)formatter.parse(d1);
+            Date date2 = (Date)formatter.parse(d2);
+            Date date3 = (Date)formatter.parse(d3);
+
+            if((date1.after(date2) && date1.before(date3)) || date1.equals(date2))
+                return true;
+            else
+                return false;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
 
     }
 

@@ -31,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +62,8 @@ public class AdminShowBooking extends AppCompatActivity {
     ArrayAdapter<Booking> adapter;
     private ListView listView;
 
+    int child = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +71,7 @@ public class AdminShowBooking extends AppCompatActivity {
 
         Download = findViewById(R.id.B3);
         Show = findViewById(R.id.B4);
-        Click1 = findViewById(R.id.B1);
+        Click1 = findViewById(R.id.B2);
         Click2 = findViewById(R.id.B2);
         From = findViewById(R.id.ET1);
         To = findViewById(R.id.ET2);
@@ -185,13 +188,12 @@ public class AdminShowBooking extends AppCompatActivity {
             public void onClick(View v) {
 
                 list.clear();
-
+                Download.setVisibility(View.GONE);
+                child = 0;
                 if(checkDataEntered()) {
 
                     F = From.getText().toString().trim();
                     T = To.getText().toString().trim();
-                    arr1 = F.split("-");
-                    arr2 = T.split("-");
 
                     listView = findViewById(R.id.LV);
 
@@ -204,14 +206,19 @@ public class AdminShowBooking extends AppCompatActivity {
                     ref.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                            booking = dataSnapshot.getValue(Booking.class);
-                            String[] arr = booking.getCheckInDate().split("-");
-                            if (Integer.parseInt(arr[0]) >= Integer.parseInt(arr1[0])) {
-                                list.add(booking);
-                                adapter.notifyDataSetChanged();
-                                Download.setVisibility(View.VISIBLE);
 
-                            }
+                                    booking = dataSnapshot.getValue(Booking.class);
+                                    String arr = booking.getCheckInDate().split(" ")[0];
+                                    if (checkConditions(arr, F, T)) {
+                                        list.add(booking);
+                                        adapter.notifyDataSetChanged();
+                                        Download.setVisibility(View.VISIBLE);
+                                        child = 1;
+                                    }
+
+                                    if (child == 0) {
+                                    Toast.makeText(AdminShowBooking.this, "Sorry No Bookings found between respective dates..", Toast.LENGTH_LONG).show();
+                                    }
                         }
 
                         @Override
@@ -241,6 +248,26 @@ public class AdminShowBooking extends AppCompatActivity {
         });
     }
 
+
+    boolean checkConditions(String arr, String arr1, String arr2)
+    {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+        try {
+
+            Date date1 = (Date)formatter.parse(arr);
+            Date date2 = (Date)formatter.parse(arr1);
+            Date date3 = (Date)formatter.parse(arr2);
+            if((date1.after(date2) && date2.before(date3)) || date1.equals(date2) || date1.equals(date3))
+                return true;
+
+        } catch (ParseException e) {
+
+            Toast.makeText(AdminShowBooking.this, "Error name " + e, Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
     boolean isEmpty(EditText text)
     {
         CharSequence str = text.getText().toString();
@@ -266,6 +293,24 @@ public class AdminShowBooking extends AppCompatActivity {
         {
             To.setError(null);
         }
+
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            Date date1 = (Date)formatter.parse(From.getText().toString().trim());
+            Date date2 = (Date)formatter.parse(To.getText().toString().trim());
+            if(date2.before(date1))
+            {
+                To.setError("To Date should be after From Date.");
+                To.setText("");
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
         return true;
     }
 }

@@ -31,7 +31,7 @@
     </com.google.android.gms.common.SignInButton>
 
     <TextView
-        android:id="@+id/T2"
+        android:id="@+id/T3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
@@ -76,7 +76,7 @@
         android:text="Mukkam Road, Kozhikode, Kerala, 673601"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/T2" />
+        app:layout_constraintStart_toEndOf="@+id/T3" />
 
     <TextView
         android:id="@+id/textView4"

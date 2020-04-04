@@ -6,13 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,15 +36,9 @@ public class AdminCheckAvailability extends AppCompatActivity {
     int month1, month2;
     int day1, day2;
     Calendar calendar;
-    int vacant = 10;
-    int min = 10;
-    int show = 0;
-    int i;
+    int totalRooms;
+    int count = 0;
     String child, text1, text2;
-
-    String[] arr1, arr2;
-
-    GuestHouse G1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +46,7 @@ public class AdminCheckAvailability extends AppCompatActivity {
         setContentView(R.layout.activity_admin_check_availability);
 
         Check = findViewById(R.id.B3);
-        Click1 = findViewById(R.id.B1);
+        Click1 = findViewById(R.id.B2);
         Click2 = findViewById(R.id.B2);
         CID = findViewById(R.id.ET1);
         COD = findViewById(R.id.ET2);
@@ -61,13 +55,19 @@ public class AdminCheckAvailability extends AppCompatActivity {
         COD.setEnabled(false);
 
 
+        DatabaseReference reff = FirebaseDatabase.getInstance().getReference("Room");
+        reff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                count = (int) dataSnapshot.getChildrenCount();
+                totalRooms = count;
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-
-
-
-
-
+            }
+        });
 
         Click1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,81 +132,34 @@ public class AdminCheckAvailability extends AppCompatActivity {
                 SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
                 String today = formatter.format(date);
 
-                if(checkDate(today, text1 ) && checkDate(text1, text2)){
-
-
-                    arr1 = text1.split("-");
-                    arr2 = text2.split("-");
-                    day1 = Integer.parseInt(arr1[0]);
-                    day2 = Integer.parseInt(arr2[0]);
-                    month1 = Integer.parseInt(arr1[1]);
-                    month2 = Integer.parseInt(arr2[1]);
-                    year1 = Integer.parseInt(arr1[2]);
-                    year2 = Integer.parseInt(arr2[2]);
+                if(checkDataEntered()){
 
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("GuestHouse");
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                for (i = day1; i < day2; i++) {
+                                for (DataSnapshot keys : dataSnapshot.getChildren()) {
 
-                                    child = Integer.toString(i) + "-" + arr1[1] + "-" + arr1[2];
-
-                                    if (dataSnapshot.hasChild(child)) {
-
-                                        G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
-                                        vacant = G1.checkAvailability();
-                                        if (vacant < min)
-                                            min = vacant;
-
+                                    String child = keys.getKey();
+                                    if (checkDate(child, text1, text2)) {
+                                        GuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
+                                        if (G1.checkAvailability() < totalRooms)
+                                            totalRooms = G1.checkAvailability();
                                     }
-
-                                    if (i + 1 == 32) {
-                                        i = 0;
-                                        arr1[1] = arr2[1];
-                                    }
-
-                                    if (i + 1 == 31 && month1 != 1 && month1 != 3 && month1 != 5 && month1 != 7 && month1 != 8 && month1 != 10 && month1 != 12)
-                                    {
-                                        i = 0;
-                                        arr1[1] = arr2[1];
-                                    }
-                                    if (year1 != year2 && i == 31) {
-                                        arr1[2] = arr2[2];
-                                        arr1[1] = arr2[1];
-                                        i = 0;
-                                    }
-
-                                    if (year1 % 4 != 0 && month1 == 2 && i == 28) {
-                                        arr1[1] = arr2[1];
-                                        i = 0;
-                                    }
-                                    if (year1 % 4 == 0 && i == 29 && month1 == 2) {
-                                        arr1[1] = arr2[1];
-                                        i = 0;
-                                    }
-
-
 
                                 }
-
-                            final AlertDialog.Builder builder = new AlertDialog.Builder(AdminCheckAvailability.this);
-                            builder.setTitle("Total No. Of Vacant Rooms:");
-                            builder.setMessage(Integer.toString(min));
-
-                            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    min = 10;
-
-                                    dialog.cancel();
-
-                                }
-                            });
-                            builder.show();
-
+                                final AlertDialog.Builder builder = new AlertDialog.Builder(AdminCheckAvailability.this);
+                                builder.setTitle("Total No. Of Vacant Rooms : ");
+                                builder.setMessage(Integer.toString(totalRooms));
+                                totalRooms = count;
+                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                builder.show();
                         }
 
                         @Override
@@ -216,30 +169,86 @@ public class AdminCheckAvailability extends AppCompatActivity {
                     });
 
                 }
-                else
-                {
-                    Toast.makeText(AdminCheckAvailability.this, "Invalid Dates, Please retry..", Toast.LENGTH_LONG).show();
-
-                }
 
             }
         });
 
     }
 
-    boolean checkDate(String date1, String date2)
+    boolean isEmpty(EditText text)
     {
-       /* String[] arr1 = (date1.split("-"));
-        String[] arr2 = (date2.split("-"));
-        if(Integer.parseInt(arr1[2]) > Integer.parseInt(arr2[2]) )
-            return false;
-        if(Integer.parseInt(arr1[1]) > Integer.parseInt(arr2[1]) )
-            return false;
+        CharSequence str = text.getText().toString();
+        return TextUtils.isEmpty(str);
+    }
 
-        if(Integer.parseInt(arr1[0]) > Integer.parseInt(arr2[0])  && Integer.parseInt(arr1[1]) <= Integer.parseInt(arr2[1]))
-            return false;*/
+    boolean checkDataEntered() {
+
+
+        String d1 = CID.getText().toString().trim();
+        String d2 = COD.getText().toString().trim();
+        Date date1 = new Date(), date2 = new Date();
+
+        Date today = new Date();
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            date1 = (Date)formatter.parse(d1);
+            date2 = (Date)formatter.parse(d2);
+            today = formatter.parse(today.toString());
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (isEmpty(CID)) {
+            CID.setError("Check In Date is required");
+            return false;
+        }
+        else {
+
+            CID.setError(null);
+            if(date1.before(today) && date1.after(today) != false)
+            {
+                CID.setError("Check In Date should be at least today's date");
+                CID.setText("");
+                return false;
+            }
+        }
+
+        if (isEmpty(COD)) {
+            COD.setError("Check Out Date is required");
+            return false;
+        }
+        else
+            COD.setError(null);
+        if(date2.after(date1) == false )
+        {
+            COD.setError("Check Out Date should be after Check In Date");
+            COD.setText("");
+            return false;
+        }
+
         return true;
+    }
 
+    boolean checkDate(String d1, String d2, String d3)
+    {
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            Date date1 = (Date)formatter.parse(d1);
+            Date date2 = (Date)formatter.parse(d2);
+            Date date3 = (Date)formatter.parse(d3);
+
+            if((date1.after(date2) && date1.before(date3)) || date1.equals(date2))
+                return true;
+            else
+                return false;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
 
     }
 }

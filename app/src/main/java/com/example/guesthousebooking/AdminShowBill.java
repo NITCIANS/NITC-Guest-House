@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -29,17 +28,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.security.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.FileHandler;
 
 public class AdminShowBill extends AppCompatActivity {
 
@@ -69,13 +66,15 @@ public class AdminShowBill extends AppCompatActivity {
     ArrayAdapter<Bill> adapter;
     private ListView listView;
 
+    int child = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_show_bill);
         Download = findViewById(R.id.B3);
         Show = findViewById(R.id.B4);
-        Click1 = findViewById(R.id.B1);
+        Click1 = findViewById(R.id.B2);
         Click2 = findViewById(R.id.B2);
         From = findViewById(R.id.ET1);
         To = findViewById(R.id.ET2);
@@ -193,13 +192,12 @@ public class AdminShowBill extends AppCompatActivity {
             public void onClick(View v) {
 
                 list.clear();
-
+                Download.setVisibility(View.GONE);
+                child = 0;
                 if(checkDataEntered()) {
 
                     F = From.getText().toString().trim();
                     T = To.getText().toString().trim();
-                    arr1 = F.split("-");
-                    arr2 = T.split("-");
 
                     listView = findViewById(R.id.LV);
 
@@ -212,14 +210,19 @@ public class AdminShowBill extends AppCompatActivity {
                     ref.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                             bill = dataSnapshot.getValue(Bill.class);
-                            String[] arr = bill.getCheckInDate().split("-");
-                            if (true) {
+                            String arr = bill.getCheckInDate().split(" ")[0];
+                            if (checkConditions(arr, F, T)) {
                                 list.add(bill);
                                 adapter.notifyDataSetChanged();
                                 Download.setVisibility(View.VISIBLE);
-
+                                child = 1;
                             }
+                            if (child == 0) {
+                                Toast.makeText(AdminShowBill.this, "Sorry No Bills found between respective dates..", Toast.LENGTH_LONG).show();
+                            }
+
                         }
 
                         @Override
@@ -251,6 +254,25 @@ public class AdminShowBill extends AppCompatActivity {
 
     }
 
+    boolean checkConditions(String arr, String arr1, String arr2)
+    {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+        try {
+
+            Date date1 = (Date)formatter.parse(arr);
+            Date date2 = (Date)formatter.parse(arr1);
+            Date date3 = (Date)formatter.parse(arr2);
+            if((date1.after(date2) && date2.before(date3)) || date1.equals(date2) || date1.equals(date3))
+                return true;
+
+        } catch (ParseException e) {
+
+            Toast.makeText(AdminShowBill.this, "Error name " + e, Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
     boolean isEmpty(EditText text)
     {
         CharSequence str = text.getText().toString();
@@ -275,6 +297,19 @@ public class AdminShowBill extends AppCompatActivity {
         else
         {
             To.setError(null);
+        }
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+            Date date1 = (Date)formatter.parse(From.getText().toString().trim());
+            Date date2 = (Date)formatter.parse(To.getText().toString().trim());
+            if(date2.before(date1))
+            {
+                To.setError("To Date should be after From Date.");
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         return true;
     }
