@@ -102,6 +102,10 @@ public class AdminLogin extends AppCompatActivity {
             toast.show();
             return;
         }
+       else if(email1.equals("subhash") && password1.equals("yogesh")){
+            Intent intent = new Intent(this,AdminHome.class);
+            startActivity(intent);
+        }
 
 //        admAuth.signInWithEmailAndPassword(email1, password1)
 //                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
