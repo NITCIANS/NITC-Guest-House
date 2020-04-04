@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminLogin"
-    android:background="#ff000000"
-    >
+    tools:context=".AdminLogin">
 
     <EditText
         android:id="@+id/password"
@@ -21,8 +19,6 @@
         android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:selectAllOnFocus="true"
-        android:textColor="@color/design_default_color_primary_dark"
-        android:textColorHint="@color/design_default_color_primary_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/username" />
@@ -38,14 +34,12 @@
         android:hint="Admin User ID"
         android:inputType="textEmailAddress"
         android:selectAllOnFocus="true"
-        android:textColor="@color/design_default_color_primary_variant"
-        android:textColorHint="@color/design_default_color_primary_dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/Login"
+        android:id="@+id/login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
@@ -54,10 +48,6 @@
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="64dp"
         android:text="Sign In"
-        android:textColor="@color/design_default_color_error"
-        android:textColorHighlight="@color/design_default_color_error"
-        android:textColorHint="@android:color/holo_red_dark"
-        android:textColorLink="@color/design_default_color_error"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -3,6 +3,7 @@ package com.example.guesthousebooking;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.gms.common.SignInButton;
@@ -64,6 +65,14 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(SaveSharedPreference.getLoggedStatus(getApplicationContext()))
+        {
+            Intent intent = new Intent(getApplicationContext(), AdminHome.class);
+            startActivity(intent);
+        }
+
+
         AL = findViewById(R.id.adminLogin);
 
         AL.setOnClickListener(new View.OnClickListener() {

@@ -10,11 +10,11 @@
 
     <Button
         android:id="@+id/B1"
-        android:layout_width="170dp"
-        android:layout_height="58dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
         android:layout_marginStart="29dp"
         android:layout_marginLeft="29dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="7dp"
         android:layout_marginRight="7dp"
         android:onClick="showAllBoking"
@@ -25,9 +25,9 @@
 
     <Button
         android:id="@+id/B2"
-        android:layout_width="157dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="18dp"
         android:layout_marginRight="18dp"
         android:onClick="showAllBill"
@@ -38,11 +38,11 @@
 
     <Button
         android:id="@+id/B3"
-        android:layout_width="165dp"
-        android:layout_height="60dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
         android:layout_marginStart="28dp"
         android:layout_marginLeft="28dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="28dp"
         android:onClick="manageBooking"
         android:text="Manage bookings"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,10 +50,10 @@
 
     <Button
         android:id="@+id/B4"
-        android:layout_width="168dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         android:onClick="checkIn"
         android:text="Checkin - checkout"
         app:layout_constraintBottom_toBottomOf="@+id/B3"
@@ -61,60 +61,59 @@
 
     <Button
         android:id="@+id/B5"
-        android:layout_width="189dp"
-        android:layout_height="63dp"
-        android:layout_marginStart="9dp"
-        android:layout_marginLeft="9dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="60dp"
-        android:layout_marginEnd="19dp"
-        android:layout_marginRight="19dp"
         android:text="Show user bookings"
-        app:layout_constraintEnd_toStartOf="@+id/B6"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/B3" />
 
     <Button
         android:id="@+id/B6"
-        android:layout_width="150dp"
-        android:layout_height="62dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
         android:text="Show user bill"
         app:layout_constraintBaseline_toBaselineOf="@+id/B5"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.304"
         app:layout_constraintStart_toEndOf="@+id/B5" />
 
     <Button
         android:id="@+id/B7"
-        android:layout_width="174dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="13dp"
-        android:layout_marginLeft="13dp"
-        android:layout_marginTop="45dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="20dp"
         android:onClick="checkAvailability"
         android:text="Check availability"
-        app:layout_constraintEnd_toStartOf="@+id/B8"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/B5" />
 
     <Button
         android:id="@+id/B8"
-        android:layout_width="126dp"
-        android:layout_height="49dp"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
         android:layout_marginEnd="21dp"
         android:layout_marginRight="21dp"
         android:onClick="showRoom"
         android:text="Show room"
         app:layout_constraintBaseline_toBaselineOf="@+id/B7"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/B7" />
 
     <Button
         android:id="@+id/B9"
         android:layout_width="185dp"
         android:layout_height="63dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginRight="56dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="68dp"
+        android:layout_marginRight="68dp"
         android:onClick="regManage"
         android:text="Manage registration"
         app:layout_constraintEnd_toEndOf="@+id/B8"
@@ -124,10 +123,22 @@
         android:id="@+id/B10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="4dp"
         android:onClick="logout"
         android:text="logout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.959"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/B11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginBottom="4dp"
+        android:text="Change Password"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

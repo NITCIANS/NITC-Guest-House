@@ -12,19 +12,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-<<<<<<< HEAD
         android:theme="@style/AppTheme">
         <activity android:name=".AdminShowBooking"
             android:parentActivityName=".AdminHome" />
         <activity
             android:name=".ShowUserBooking"
             android:parentActivityName=".AdminHome" />
-=======
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
-
-        >
->>>>>>> ec72881469b5fd8c8254179954a9a2fa0aff7cfd
         <activity
             android:name=".AddRoom"
             android:parentActivityName=".ShowRoom" />
@@ -57,13 +50,13 @@
         <activity
             android:name=".AdminViewBooking"
             android:parentActivityName=".ManageBookings" />
-        <activity android:name=".AdminLogin" />
+        <activity android:name=".AdminLogin"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Home"
             android:label="@string/title_activity_home"
             android:parentActivityName=".Home"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".HomeUser" />
         <activity android:name=".Register" />
         <activity android:name=".MainActivity">
             <intent-filter>

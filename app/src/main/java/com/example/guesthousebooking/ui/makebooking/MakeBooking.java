@@ -141,7 +141,6 @@ public class MakeBooking extends Fragment {
                             booking.setBookingId(count + 1);
 
 
-
                             day1 = Integer.parseInt(arr1[0]);
                             day2 = Integer.parseInt(arr2[0]);
 
@@ -175,8 +174,8 @@ public class MakeBooking extends Fragment {
                                     }
 
                                     if(check == 0) {
-                                        ref.child(Integer.toString(count + 1)).setValue(booking);
                                         Toast.makeText(getActivity(), "You made a Booking.", Toast.LENGTH_LONG).show();
+                                        ref.child(Integer.toString(count + 1)).setValue(booking);
                                         Intent intent = new Intent(getActivity(), Home.class);
                                         startActivity(intent);
                                     }
@@ -343,7 +342,7 @@ public class MakeBooking extends Fragment {
             return false;
         }
 
-        if(Math.abs(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1])) != 1 || Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1]) != 11)
+        if(Math.abs(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1])) != 1 || Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1]) == 11)
         {
             Toast.makeText(getActivity(), "You can make bookings only 1 Month or less before your Check In Date..", Toast.LENGTH_LONG).show();
             return  false;
