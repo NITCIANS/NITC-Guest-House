@@ -2,10 +2,18 @@ package com.example.guesthousebooking;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.pm.PackageManager;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -13,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -20,8 +29,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class AdminShowBooking extends AppCompatActivity {
@@ -41,6 +54,7 @@ public class AdminShowBooking extends AppCompatActivity {
     String bookingId;
 
     String[] arr1, arr2;
+    String F, T;
 
     private DatabaseReference ref;
     private List<Booking> list = new ArrayList<>();
@@ -112,6 +126,58 @@ public class AdminShowBooking extends AppCompatActivity {
             }
 
         });
+        Download.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+
+                PdfDocument myPdfDocument = new PdfDocument();
+                PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(300,600,1).create();
+                PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
+
+                Paint myPaint = new Paint();
+
+                String myString = "Bookings From : " + F + " To : " + T + "\n\n";
+                int i = 1;
+                for( Booking B : list) {
+
+                    myString += i++ + " :- \n\n";
+                    myString += B;
+                    myString += "\n\n";
+
+                }
+                ActivityCompat.requestPermissions(AdminShowBooking.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
+                int x = 10, y=25;
+
+                for (String line: myString.split("\n"))
+                {
+                    myPage.getCanvas().drawText(line, x, y, myPaint);
+                    y += myPaint.descent()-myPaint.ascent();
+                }
+                myPdfDocument.finishPage(myPage);
+                try
+                {
+                    File file = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS );
+                    if(!file.exists())
+                        file.mkdir();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    Date date = new Date();
+                    String filename = date.toString();
+                    file = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/" + filename + ".pdf");
+                    myPdfDocument.writeTo(new FileOutputStream(file));
+                    myPdfDocument.close();
+                    Toast.makeText(AdminShowBooking.this, filename + " Downloaded", Toast.LENGTH_LONG).show();
+                }
+                catch (Exception e){
+
+                    Toast.makeText(AdminShowBooking.this, "Error name " + e, Toast.LENGTH_LONG).show();
+
+                }
+
+
+
+            }
+        });
 
 
         Show.setOnClickListener(new View.OnClickListener() {
@@ -122,8 +188,10 @@ public class AdminShowBooking extends AppCompatActivity {
 
                 if(checkDataEntered()) {
 
-                    arr1 = From.getText().toString().trim().split("-");
-                    arr2 = To.getText().toString().trim().split("-");
+                    F = From.getText().toString().trim();
+                    T = To.getText().toString().trim();
+                    arr1 = F.split("-");
+                    arr2 = T.split("-");
 
                     listView = findViewById(R.id.LV);
 

@@ -33,8 +33,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.FileHandler;
 
@@ -59,6 +62,7 @@ public class AdminShowBill extends AppCompatActivity {
     String bookingId;
 
     String[] arr1, arr2;
+    String F, T;
 
     private DatabaseReference ref;
     private List<Bill> list = new ArrayList<>();
@@ -141,7 +145,17 @@ public class AdminShowBill extends AppCompatActivity {
                 PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
 
                 Paint myPaint = new Paint();
-                String myString = "My Name is Yogesh Kumar Adhikari";
+
+                String myString = "Bills From : " + F + " To : " + T + "\n\n";
+                int i = 1;
+                for( Bill B : list) {
+
+                    myString += i++ + " :- \n\n";
+                    myString += B;
+                    myString += "\n\n";
+
+                }
+                ActivityCompat.requestPermissions(AdminShowBill.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
                 int x = 10, y=25;
 
                 for (String line: myString.split("\n"))
@@ -150,23 +164,24 @@ public class AdminShowBill extends AppCompatActivity {
                     y += myPaint.descent()-myPaint.ascent();
                 }
                 myPdfDocument.finishPage(myPage);
-
-
-
-
                 try
                 {
-                    //ActivityCompat.requestPermissions(AdminShowBill.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                   //ActivityCompat.requestPermissions(AdminShowBill.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, PackageManager.PERMISSION_GRANTED);
-                    //myPdfDocument.writeTo(new FileOutputStream(filePath));
+                    File file = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS );
+                    if(!file.exists())
+                        file.mkdir();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    Date date = new Date();
+                    String filename = date.toString();
+                    file = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS + "/" + filename + ".pdf");
+                    myPdfDocument.writeTo(new FileOutputStream(file));
+                    myPdfDocument.close();
+                    Toast.makeText(AdminShowBill.this, filename + " Downloaded", Toast.LENGTH_LONG).show();
                 }
                 catch (Exception e){
 
                     Toast.makeText(AdminShowBill.this, "Error name " + e, Toast.LENGTH_LONG).show();
 
                 }
-
-                myPdfDocument.close();
 
 
 
@@ -181,8 +196,10 @@ public class AdminShowBill extends AppCompatActivity {
 
                 if(checkDataEntered()) {
 
-                    arr1 = From.getText().toString().trim().split("-");
-                    arr2 = To.getText().toString().trim().split("-");
+                    F = From.getText().toString().trim();
+                    T = To.getText().toString().trim();
+                    arr1 = F.split("-");
+                    arr2 = T.split("-");
 
                     listView = findViewById(R.id.LV);
 
@@ -197,7 +214,7 @@ public class AdminShowBill extends AppCompatActivity {
                         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                             bill = dataSnapshot.getValue(Bill.class);
                             String[] arr = bill.getCheckInDate().split("-");
-                            if (Integer.parseInt(arr[0]) >= Integer.parseInt(arr1[0])) {
+                            if (true) {
                                 list.add(bill);
                                 adapter.notifyDataSetChanged();
                                 Download.setVisibility(View.VISIBLE);
