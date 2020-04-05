@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.guesthousebooking.AbstractGuestHouse;
 import com.example.guesthousebooking.Booking;
 import com.example.guesthousebooking.GuestHouse;
 import com.example.guesthousebooking.Home;
@@ -62,11 +63,13 @@ public class MakeBooking extends Fragment {
     int count = 0;
     int i, rooms;
     String userType;
-    String child;
+    int totalRooms = 0;
     int check = 0;
+    int done = 0;
+    boolean entered = true;
 
 
-    private DatabaseReference ref, reff, reference;
+    private DatabaseReference ref, reff, reference, getRef;
 
 
     public static MakeBooking newInstance() {
@@ -82,7 +85,7 @@ public class MakeBooking extends Fragment {
 
 
 
-       /* CIB = V.findViewById(R.id.B2);
+        CIB = V.findViewById(R.id.B1);
         COB= V.findViewById(R.id.B2);
         Book= V.findViewById(R.id.B3);
 
@@ -104,6 +107,19 @@ public class MakeBooking extends Fragment {
         ref = FirebaseDatabase.getInstance().getReference("Booking");
         reff = FirebaseDatabase.getInstance().getReference("GuestHouse");
         reference = FirebaseDatabase.getInstance().getReference("User");
+        getRef = FirebaseDatabase.getInstance().getReference("Room");
+        getRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = (int) dataSnapshot.getChildrenCount();
+                totalRooms = count;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -163,7 +179,8 @@ public class MakeBooking extends Fragment {
                             booking.setType(userType);
 
                             booking.setBookingDate(today);
-                            if(Food.isSelected())
+
+                            if(Food.isChecked())
                                 booking.setFoodServices(true);
                             else
                                 booking.setFoodServices(false);
@@ -177,115 +194,103 @@ public class MakeBooking extends Fragment {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                    check = 0;
-                                    for (DataSnapshot keys : dataSnapshot.getChildren()) {
+                                    if (entered) {
+                                        check = 0;
+                                        for (DataSnapshot keys : dataSnapshot.getChildren()) {
 
-                                        String child = keys.getKey();
-                                        if (checkDate(child, CIDate, CODate)) {
-                                            GuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
-                                            if (G1.checkAvailability() < rooms)
-                                                check = 1;
+                                            String child = keys.getKey();
+                                            if (checkDate(child, CIDate, CODate)) {
+                                                GuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
+                                                if (G1.checkAvailability() < rooms)
+                                                    check = 1;
+                                            }
+
+                                        }
+                                        if (check == 0) {
+                                            if (userType.equals("Director") || userType.equals("Registrar")) {
+                                                booking.setBookingStatus("Confirmed");
+                                                booking.sendMail(getActivity(), 1);
+                                                Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
+                                                ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                entered = false;
+                                                createEntries(CIDate, CODate);
+                                            } else if (userType.equals("Faculty") || userType.equals("Staff") || userType.equals("SAC Member")) {
+                                                SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                                Date currentDate = new Date();
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(currentDate);
+                                                c.add(Calendar.DAY_OF_MONTH, 3);
+                                                Date currentDatePlusThree = c.getTime();
+
+                                                try {
+                                                    Date date1 = (Date) formatter.parse(CIDate);
+                                                    String dates = formatter.format(currentDatePlusThree);
+                                                    Date newDate = (Date) formatter.parse(dates);
+
+                                                    if (newDate.after(date1)) {
+                                                        booking.setBookingStatus("Confirmed");
+                                                        booking.sendMail(getActivity(), 1);
+                                                        Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
+                                                        ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                        entered = false;
+                                                        createEntries(CIDate, CODate);
+                                                    } else {
+                                                        booking.setBookingStatus("Pending");
+                                                        booking.sendMail(getActivity(), 3);
+                                                        Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
+                                                        ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                        entered = false;
+                                                        Intent intent = new Intent(getActivity(), Home.class);
+                                                        startActivity(intent);
+                                                    }
+                                                } catch (ParseException e) {
+                                                    Toast.makeText(getActivity(), "Error : " + e, Toast.LENGTH_LONG).show();
+
+
+                                                }
+
+
+                                            } else {
+
+                                                SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                                Date currentDate = new Date();
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(currentDate);
+                                                c.add(Calendar.DAY_OF_MONTH, 1);
+                                                Date currentDatePlusOne = c.getTime();
+
+                                                try {
+                                                    Date date1 = (Date) formatter.parse(CIDate);
+                                                    String dates = formatter.format(currentDatePlusOne);
+                                                    Date newDate = (Date) formatter.parse(dates);
+
+                                                    if (newDate.after(date1)) {
+                                                        booking.setBookingStatus("Confirmed");
+                                                        booking.sendMail(getActivity(), 1);
+                                                        Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
+                                                        ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                        createEntries(CIDate, CODate);
+                                                        entered = false;
+                                                    } else {
+                                                        booking.setBookingStatus("Pending");
+                                                        booking.sendMail(getActivity(), 3);
+                                                        Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
+                                                        ref.child(Integer.toString(count + 1)).setValue(booking);
+                                                        entered = false;
+                                                        Intent intent = new Intent(getActivity(), Home.class);
+                                                        startActivity(intent);
+                                                    }
+                                                } catch (ParseException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                            }
+
+                                        } else {
+                                            Toast.makeText(getActivity(), "Rooms not available, Please check availability for your query first..", Toast.LENGTH_LONG).show();
                                         }
 
                                     }
-                                    if(check == 0) {
-
-                                        if(userType.equals("Director") || userType.equals("Registrar"))
-                                        {
-                                            booking.setBookingStatus("Confirmed");
-                                            booking.sendMail(getActivity(), 1);
-                                            Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details.." , Toast.LENGTH_LONG).show();
-                                            ref.child(Integer.toString(count + 1)).setValue(booking);
-                                            Intent intent = new Intent(getActivity(), Home.class);
-                                            startActivity(intent);
-                                        }
-                                        else if(userType.equals("Faculty") || userType.equals("Staff") || userType.equals("SAC Member"))
-                                        {
-                                            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
-                                            Date currentDate = new Date();
-                                            Calendar c = Calendar.getInstance();
-                                            c.setTime(currentDate);
-                                            c.add(Calendar.DAY_OF_MONTH, 3);
-                                            Date currentDatePlusThree = c.getTime();
-
-                                            try {
-                                                Date date1 = (Date)formatter.parse(CIDate);
-                                                String dates = formatter.format(currentDatePlusThree);
-                                                Date newDate = (Date)formatter.parse(dates);
-
-                                                if(newDate.after(date1))
-                                                {
-                                                    booking.setBookingStatus("Confirmed");
-                                                    booking.sendMail(getActivity(), 1);
-                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
-                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
-                                                    Intent intent = new Intent(getActivity(), Home.class);
-                                                    startActivity(intent);
-                                                }
-                                                else
-                                                {
-                                                    booking.setBookingStatus("Pending");
-                                                    booking.sendMail(getActivity(), 3);
-                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
-                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
-                                                    Intent intent = new Intent(getActivity(), Home.class);
-                                                    startActivity(intent);
-                                                }
-                                            }
-                                            catch (ParseException e) {
-                                                Toast.makeText(getActivity(), "Error : " + e, Toast.LENGTH_LONG).show();
-
-
-                                            }
-
-
-                                        }
-                                        else
-                                        {
-
-                                            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
-                                            Date currentDate = new Date();
-                                            Calendar c = Calendar.getInstance();
-                                            c.setTime(currentDate);
-                                            c.add(Calendar.DAY_OF_MONTH, 1);
-                                            Date currentDatePlusOne = c.getTime();
-
-                                            try {
-                                                Date date1 = (Date)formatter.parse(CIDate);
-                                                String dates = formatter.format(currentDatePlusOne);
-                                                Date newDate = (Date)formatter.parse(dates);
-
-                                                if(newDate.after(date1))
-                                                {
-                                                    booking.setBookingStatus("Confirmed");
-                                                    booking.sendMail(getActivity(), 1);
-                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details", Toast.LENGTH_LONG).show();
-                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
-                                                    Intent intent = new Intent(getActivity(), Home.class);
-                                                    startActivity(intent);
-                                                }
-                                                else
-                                                {
-                                                    booking.setBookingStatus("Pending");
-                                                    booking.sendMail(getActivity(), 3);
-                                                    Toast.makeText(getActivity(), "You made a Booking.. Check Email for more details..", Toast.LENGTH_LONG).show();
-                                                    ref.child(Integer.toString(count + 1)).setValue(booking);
-                                                    Intent intent = new Intent(getActivity(), Home.class);
-                                                    startActivity(intent);
-                                                }
-                                            }
-                                            catch (ParseException e) {
-                                                e.printStackTrace();
-                                            }
-
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        Toast.makeText(getActivity(), "Rooms not available, Please check availability for your query first..", Toast.LENGTH_LONG).show();
-                                    }
-
                                 }
 
                                 @Override
@@ -363,9 +368,66 @@ public class MakeBooking extends Fragment {
 
             }
 
-        });*/
+        });
         return V;
 
+    }
+
+    void createEntries(final String d1, final String d2)
+    {
+
+        reff = FirebaseDatabase.getInstance().getReference("GuestHouse");
+        reff.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (done == 0) {
+
+                            try {
+
+                                SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                Date date1 = (Date) formatter.parse(d1);
+                                Date date2 = (Date) formatter.parse(d2);
+                                String child = "";
+                                GuestHouse G1;
+
+                                while (date1.before(date2)) {
+
+                                    child = formatter.format(date1);
+                                    if (dataSnapshot.hasChild(child)) {
+                                        G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
+                                        G1.setOccupiedRooms(G1.getVacantRooms() - rooms);
+                                        G1.setVacantRooms(G1.getTotalRooms() - G1.getOccupiedRooms());
+                                    } else {
+                                        G1 = new GuestHouse();
+                                        G1.setGuestHouseId(1);
+                                        G1.setTotalRooms(totalRooms);
+                                        G1.setVacantRooms(totalRooms - rooms);
+                                        G1.setOccupiedRooms(rooms);
+                                    }
+                                    reff.child(child).setValue(G1);
+                                    date1 = (Date) formatter.parse(child);
+                                    Calendar c = Calendar.getInstance();
+                                    c.setTime(date1);
+                                    c.add(Calendar.DAY_OF_MONTH, 1);
+                                    date1 = c.getTime();
+
+                                }
+                                done = 1;
+                                Intent intent = new Intent(getActivity(), Home.class);
+                                startActivity(intent);
+                            } catch (Exception e) {
+                                Toast.makeText(getActivity(), "Error : " + e, Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     boolean isEmpty(EditText text)

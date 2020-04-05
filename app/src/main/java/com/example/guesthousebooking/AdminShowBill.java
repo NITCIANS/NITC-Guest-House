@@ -74,7 +74,7 @@ public class AdminShowBill extends AppCompatActivity {
         setContentView(R.layout.activity_admin_show_bill);
         Download = findViewById(R.id.B3);
         Show = findViewById(R.id.B4);
-        Click1 = findViewById(R.id.B2);
+        Click1 = findViewById(R.id.B1);
         Click2 = findViewById(R.id.B2);
         From = findViewById(R.id.ET1);
         To = findViewById(R.id.ET2);

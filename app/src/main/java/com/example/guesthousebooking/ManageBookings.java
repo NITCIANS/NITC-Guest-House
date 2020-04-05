@@ -19,9 +19,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class ManageBookings extends AppCompatActivity {
 
@@ -29,8 +31,10 @@ public class ManageBookings extends AppCompatActivity {
     private Spinner S1;
     private ListView listView;
     private List<Booking> list = new ArrayList<>();
+    private List<Booking> newList = new ArrayList<>();
     ArrayAdapter<Booking> adapter;
     private DatabaseReference ref;
+    int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +48,8 @@ public class ManageBookings extends AppCompatActivity {
         B1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                newList.clear();
                 list.clear();
-
                 final String str = S1.getSelectedItem().toString().trim();
                 if(str.equals("Choose Booking Kind"))
                 {
@@ -91,30 +95,40 @@ public class ManageBookings extends AppCompatActivity {
 
                     ref = FirebaseDatabase.getInstance().getReference("Booking");
 
-                    ref.addChildEventListener(new ChildEventListener() {
+                    ref.addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
-                        {
-                            Booking booking = dataSnapshot.getValue(Booking.class);
-                            if(booking.getBookingStatus().equals(str))
-                                list.add(booking);
-                            adapter.notifyDataSetChanged();
-
-                        }
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                        @Override
-                        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                            for (DataSnapshot keys : dataSnapshot.getChildren())
+                            {
+                                String child = keys.getKey();
+                                Booking booking = dataSnapshot.child(child).getValue(Booking.class);
+                                if(booking.getBookingStatus().equals(str))
+                                {
+                                    if(str.equals("Pending"))
+                                    {
+                                        newList.add(booking);
+                                        count++;
+                                    }
+                                    else
+                                    {
+                                        list.add(booking);
+                                        adapter.notifyDataSetChanged();
 
-                        }
-
-                        @Override
-                        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                    }
+                                }
+                            }
+                            if(newList.size() > 0)
+                            {
+                                Priority P = new Priority();
+                                PriorityQueue<Booking> PQueue = P.priorTize(count, newList, 2);
+                                while (!PQueue.isEmpty())
+                                {
+                                    list.add(PQueue.poll());
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
 
                         }
 
@@ -123,6 +137,8 @@ public class ManageBookings extends AppCompatActivity {
 
                         }
                     });
+
+
 
                 }
 

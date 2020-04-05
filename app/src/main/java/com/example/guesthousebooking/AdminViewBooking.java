@@ -19,7 +19,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class AdminViewBooking extends AppCompatActivity {
 
@@ -31,15 +35,11 @@ public class AdminViewBooking extends AppCompatActivity {
     private Button B1, B2;
     int check = 0;
     String child;
-    GuestHouse G1 = new GuestHouse();
-    int i = 0;
     int stop = 0;
-    String[] arr1, arr2;
-    int day1, day2, year1, year2, month1, month2;
     ArrayList<GuestHouse> List = new ArrayList<>();
     ArrayList<String> ChildList = new ArrayList<>();
     Booking booking = new Booking();
-    int free = 0;
+    int total = 0;
     int once = 0;
 
     @Override
@@ -47,6 +47,22 @@ public class AdminViewBooking extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_view_booking);
+
+
+
+        DatabaseReference reff = FirebaseDatabase.getInstance().getReference("Room");
+        reff.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = (int) dataSnapshot.getChildrenCount();
+                total = count;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         T9 = findViewById(R.id.T9);
@@ -57,7 +73,7 @@ public class AdminViewBooking extends AppCompatActivity {
         T14 = findViewById(R.id.T14);
         T15 = findViewById(R.id.T15);
         T16 = findViewById(R.id.T16);
-        B1 = findViewById(R.id.B2);
+        B1 = findViewById(R.id.B1);
         B2 = findViewById(R.id.B2);
 
 
@@ -110,165 +126,78 @@ public class AdminViewBooking extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            final String checkInDate = BookingDetails[3].split(" ")[0];
-                            final String checkOutDate = BookingDetails[4].split(" ")[0];
-
-
-
-
-                            arr1 = checkInDate.split("-");
-                            arr2 = checkOutDate.split("-");
-                            day1 = Integer.parseInt(arr1[0]);
-                            day2 = Integer.parseInt(arr2[0]);
-                            month1 = Integer.parseInt(arr1[1]);
-                            month2 = Integer.parseInt(arr2[1]);
-                            year1 = Integer.parseInt(arr1[2]);
-                            year2 = Integer.parseInt(arr2[2]);
-
+                            final String checkInDate = BookingDetails[3];
+                            final String checkOutDate = BookingDetails[4];
                             final int rooms = Integer.parseInt(BookingDetails[5]);
 
 
                             ref = FirebaseDatabase.getInstance().getReference("GuestHouse");
-
-                            if(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1]) == 0)
-                            {
-                                    ref.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                                            if(free == 0) {
-                                                for (i = day1; i < day2; i++) {
-
-                                                    child = Integer.toString(i) + "-" + arr1[1] + "-" + arr1[2];
-                                                    ChildList.add(child);
-
-                                                    if (dataSnapshot.hasChild(child)) {
-
-                                                        G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
-                                                        int vacant = G1.getVacantRooms();
-                                                        if (vacant < rooms) {
-
-                                                            Toast.makeText(AdminViewBooking.this, "Rooms not available", Toast.LENGTH_SHORT).show();
-                                                            Intent intent = new Intent(AdminViewBooking.this, ManageBookings.class);
-                                                            startActivity(intent);
-                                                            check = 1;
-                                                            free = 1;
-                                                            break;
-                                                        } else {
-                                                            int occupied = G1.getOccupiedRooms();
-                                                            G1.setOccupiedRooms(occupied + Integer.parseInt(BookingDetails[5]));
-                                                            G1.setVacantRooms(vacant - Integer.parseInt(BookingDetails[5]));
-                                                            List.add(G1);
-                                                        }
-
-                                                    }
-                                                    else {
-
-                                                        G1.setVacantRooms(G1.getTotalRooms() - rooms);
-                                                        G1.setOccupiedRooms(rooms);
-                                                        G1.setGuestHouseId(1);
-                                                        List.add(G1);
-                                                    }
-                                                }
-                                                if(check == 0) {
-                                                    int k = 0;
-                                                    for (GuestHouse G : List) {
-                                                        ref.child(ChildList.get(k++)).setValue(G);
-                                                    }
-                                                    changeBookingStatus(BookingDetails[0]);
-                                                    check = 1;
-                                                }
-                                                free = 1;
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                            }
-                            else {
-
                                 ref.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                                        if (stop == 0) {
 
-                                        if(free == 0) {
-                                            for (i = day1; i != day2; i++) {
+                                            try {
+                                                SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+                                                Date date1 = (Date) formatter.parse(checkInDate);
+                                                Date date2 = (Date) formatter.parse(checkOutDate);
+                                                String child = "";
 
-                                                child = Integer.toString(i) + "-" + arr1[1] + "-" + arr1[2];
-                                                ChildList.add(child);
+                                               while (date1.before(date2)) {
 
-                                                if (dataSnapshot.hasChild(child)) {
+                                                    child = formatter.format(date1);
 
-                                                    G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
-                                                    int vacant = G1.getVacantRooms();
-                                                    if (vacant < rooms) {
+                                                    ChildList.add(child);
+                                                    if (dataSnapshot.hasChild(child)) {
+                                                        GuestHouse G1 = dataSnapshot.child(child).getValue(GuestHouse.class);
+                                                        if (G1.checkAvailability() < rooms) {
 
-                                                        Toast.makeText(AdminViewBooking.this, "Rooms not available", Toast.LENGTH_SHORT).show();
-                                                        Intent intent = new Intent(AdminViewBooking.this, ManageBookings.class);
-                                                        startActivity(intent);
-                                                        check = 1;
-                                                        free = 1;
-                                                        break;
+                                                            List.clear();
+                                                            check = 1;
+                                                            stop = 1;
+                                                            break;
+                                                        } else {
+                                                            G1.setOccupiedRooms(G1.getVacantRooms() - rooms);
+                                                            G1.setVacantRooms(G1.getTotalRooms() - G1.getOccupiedRooms());
+                                                            List.add(G1);
+                                                        }
                                                     } else {
-                                                        int occupied = G1.getOccupiedRooms();
-                                                        G1.setOccupiedRooms(occupied + Integer.parseInt(BookingDetails[5]));
-                                                        G1.setVacantRooms(vacant - Integer.parseInt(BookingDetails[5]));
+                                                        GuestHouse G1 = new GuestHouse();
+                                                        G1.setGuestHouseId(1);
+                                                        G1.setTotalRooms(total);
+                                                        G1.setOccupiedRooms(rooms);
+                                                        G1.setVacantRooms(total - rooms);
                                                         List.add(G1);
                                                     }
 
-                                                }
-                                                else {
-
-                                                    G1.setVacantRooms(G1.getTotalRooms() - rooms);
-                                                    G1.setOccupiedRooms(rooms);
-                                                    G1.setGuestHouseId(1);
-                                                    List.add(G1);
+                                                    date1 = (Date) formatter.parse(child);
+                                                    Calendar c = Calendar.getInstance();
+                                                    c.setTime(date1);
+                                                    c.add(Calendar.DAY_OF_MONTH, 1);
+                                                    date1 = c.getTime();
                                                 }
 
-                                                if (i + 1 == 32) {
-                                                    i = 0;
-                                                    arr1[1] = arr2[1];
-                                                }
-
-                                                if (i + 1 == 31 && month1 != 1 && month1 != 3 && month1 != 5 && month1 != 7 && month1 != 8 && month1 != 10 && month1 != 12)
-                                                {
-                                                    i = 0;
-                                                    arr1[1] = arr2[1];
-                                                }
-                                                if (year1 != year2 && i == 31) {
-                                                    arr1[2] = arr2[2];
-                                                    arr1[1] = arr2[1];
-                                                    i = 0;
-                                                }
-
-                                                if (year1 % 4 != 0 && month1 == 2 && i == 28) {
-                                                    arr1[1] = arr2[1];
-                                                    i = 0;
-                                                }
-                                                if (year1 % 4 == 0 && i == 29 && month1 == 2) {
-                                                    arr1[1] = arr2[1];
-                                                    i = 0;
-                                                }
-
-                                            }
-                                            if(check == 0) {
                                                 int k = 0;
                                                 for (GuestHouse G : List) {
                                                     ref.child(ChildList.get(k++)).setValue(G);
                                                 }
-                                                changeBookingStatus(BookingDetails[0]);
-                                                check = 1;
-                                            }
-                                            free = 1;
-                                        }
+                                                if (check == 0) {
+                                                    stop = 1;
+                                                    changeBookingStatus(BookingDetails[0]);
+                                                    check = 1;
+                                                } else {
+                                                    stop = 1;
+                                                    Toast.makeText(AdminViewBooking.this, "Rooms not available", Toast.LENGTH_LONG).show();
+                                                    Intent intent = new Intent(AdminViewBooking.this, ManageBookings.class);
+                                                    startActivity(intent);
 
+                                                }
+                                            } catch (Exception e) {
+                                                Toast.makeText(AdminViewBooking.this, "Error : " + e, Toast.LENGTH_LONG).show();
+
+                                            }
+                                        }
                                     }
 
                                     @Override
@@ -276,7 +205,6 @@ public class AdminViewBooking extends AppCompatActivity {
 
                                     }
                                 });
-                            }
 
                         }
                     });
@@ -305,10 +233,12 @@ public class AdminViewBooking extends AppCompatActivity {
 
                             if(BookingDetails[7].equals("Pending")) {
                                 booking.setBookingStatus("Rejected");
-                                booking.sendMail(AdminViewBooking.this, 2);
+                                booking.sendMail(AdminViewBooking.this, 3);
                             }
-                            else
+                            else {
                                 booking.setBookingStatus("Cancelled");
+                                booking.sendMail(AdminViewBooking.this, 3);
+                            }
 
                             ref = FirebaseDatabase.getInstance().getReference("Booking");
                             ref.child(BookingDetails[0]).setValue(booking);
@@ -338,35 +268,6 @@ public class AdminViewBooking extends AppCompatActivity {
 
     }
 
-    void checkAvailability(final String cidate, final String codate, final int num)
-    {
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference ref = rootRef.child("GuestHouse");
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                for (DataSnapshot keys : dataSnapshot.getChildren()) {
-                    if (keys.getKey().equals(cidate)) {
-                        AbstractGuestHouse G1 = dataSnapshot.child(cidate).getValue(GuestHouse.class);
-                        if(G1.checkAvailability() < num) {
-
-                            Toast.makeText(AdminViewBooking.this, "Function called", Toast.LENGTH_SHORT).show();
-                            free = 1;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        ref.addListenerForSingleValueEvent(valueEventListener);
-    }
 
     void changeBookingStatus(final String bookId)
     {

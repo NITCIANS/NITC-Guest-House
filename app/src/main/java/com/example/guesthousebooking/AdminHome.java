@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +53,24 @@ public class AdminHome extends AppCompatActivity {
         showUserBill = findViewById(R.id.B6);
         changePassword = findViewById(R.id.B11);
 
+        Date date = new Date();
+        System.out.println(date);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy");
+        String dates = formatter.format(date);
+        dates += " 17:00:00";
+        formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+
+        try {
+
+            Date newDate = (Date) formatter.parse(dates);
+            long timeMilli = newDate.getTime();
+            setAlarm(timeMilli);
+
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(AdminHome.this, "Automatic Confirming Booking Scheduling has been failed.", Toast.LENGTH_LONG).show();
+        }
 
         showUserBooking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,6 +315,20 @@ public class AdminHome extends AppCompatActivity {
             }
 
         });
+    }
+
+    private void setAlarm(long timeInMillis) {
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, ScheduledTask.class);
+
+        PendingIntent pendingIntent =  PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC, timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent);
+        Toast.makeText(AdminHome.this, "Automatic Confirming Booking has been scheduled..", Toast.LENGTH_LONG).show();
+
+
     }
 
 

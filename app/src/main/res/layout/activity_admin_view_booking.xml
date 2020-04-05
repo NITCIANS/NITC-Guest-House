@@ -208,7 +208,7 @@
     </TableLayout>
 
     <Button
-        android:id="@+id/B2"
+        android:id="@+id/B1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -232,8 +232,7 @@
         android:layout_marginBottom="120dp"
         android:text="Reject"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/B2" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/textView"

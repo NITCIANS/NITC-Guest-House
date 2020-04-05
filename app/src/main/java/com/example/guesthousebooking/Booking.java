@@ -123,4 +123,26 @@ public class Booking
         javaMailAPI.execute();
 
     }
+
+    public void sendMail(int type)
+    {
+        String mail = this.userId;
+        String details = "Your Booking Details: \n Booking ID : " + this.bookingId + "\nBooking Date : " + this.bookingDate + "\n No. of Rooms : " + this.noOfRooms + "\n Check In Date : " + this.checkInDate + "\n Check Out Date : " + this.checkOutDate;
+
+        String subject = "NITC Guesthoust Booking";
+        String message = "";
+        if(type == 1)
+            message = "Your Booking is Confirmed";
+        else if(type == 2)
+            message = "You have made a Booking";
+        else if(type == 3)
+            message = "Your Booking has been Rejected due to certain Conditions";
+
+        message = message + "\n" + details;
+        JavaMailAPI javaMailAPI = new JavaMailAPI(mail, subject, message);
+        javaMailAPI.execute();
+
+    }
+
+
 }
